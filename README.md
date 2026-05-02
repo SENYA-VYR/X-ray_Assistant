@@ -76,23 +76,21 @@
 ## 🏗️ Архитектура проекта
 
 ### Структура файлов:
-
-crack_detector/
-├── app.py # Логика приложения (Flask-роуты)
-├── db.py # Модели базы данных (SQLAlchemy)
-├── model.py # Нейросеть и алгоритмы анализа
-├── crack_model.pth # Сохранённая обученная модель
-├── templates/ # HTML-шаблоны
-│ ├── base.html # Базовый шаблон с навигацией
-│ ├── login.html # Страница входа
-│ ├── register.html # Страница регистрации
-│ ├── dashboard.html # Личный кабинет врача
-│ ├── new_study.html # Загрузка нового снимка
-│ ├── result.html # Результаты анализа
-│ └── feedback.html # Форма обратной связи
-└── static/
-├── style.css # Стили
-└── uploads/ # Загруженные рентгеновские снимки
+```
+── app.py ← логика
+├── db.py ← модели базы данных
+├── model.py ← нейросеть и анализ
+├── templates/ ← HTML-страницы
+│ ├── base.html
+│ ├── login.html
+│ ├── register.html
+│ ├── dashboard.html
+│ ├── new_study.html
+│ ├── result.html
+│ └── feedback.html
+└── static/ ← CSS и загруженные снимки
+├── style.css
+└── uploads/```
 
 ---
 

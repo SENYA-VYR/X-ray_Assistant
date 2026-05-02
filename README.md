@@ -76,3 +76,82 @@
 ## 🏗️ Архитектура проекта
 
 ### Структура файлов:
+
+crack_detector/
+├── app.py # Логика приложения (Flask-роуты)
+├── db.py # Модели базы данных (SQLAlchemy)
+├── model.py # Нейросеть и алгоритмы анализа
+├── crack_model.pth # Сохранённая обученная модель
+├── templates/ # HTML-шаблоны
+│ ├── base.html # Базовый шаблон с навигацией
+│ ├── login.html # Страница входа
+│ ├── register.html # Страница регистрации
+│ ├── dashboard.html # Личный кабинет врача
+│ ├── new_study.html # Загрузка нового снимка
+│ ├── result.html # Результаты анализа
+│ └── feedback.html # Форма обратной связи
+└── static/
+├── style.css # Стили
+└── uploads/ # Загруженные рентгеновские снимки
+
+---
+
+## 🔄 Схема информационных потоков
+
+РЕНТГЕНОЛОГ
+│
+├─ Авторизация/Регистрация ──→ Flask (сессия) ──→ SQLite (doctors)
+│
+├─ Новое исследование:
+│ ├─ Выбор пациента ──→ Flask ──→ SQLite (patients)
+│ └─ Загрузка снимка ──→ static/uploads/
+│
+├─ Анализ снимка:
+│ └─ Flask ──→ model.py ──→ OpenCV + Нейросеть
+│ │
+│ └─ Объединение результатов → снимок с рамками + JSON
+│ │
+│ └─ Flask ──→ result.html (визуализация)
+│
+├─ Обратная связь:
+│ └─ Врач оценивает каждую зону (да/нет)
+│ │
+│ ├─ Flask ──→ SQLite (training_data)
+│ └─ model.py → дообучение нейросети → crack_model.pth
+│
+└─ Просмотр истории:
+└─ Flask ──→ SQLite (studies) ──→ dashboard.html
+
+---
+
+## 🔗 Схема связи модулей
+
+
+
+---
+
+## 📋 База данных
+
+### Таблицы:
+
+| Таблица | Назначение |
+|---------|------------|
+| **doctors** | Врачи: логин, пароль (хэш), ФИО, медучреждение |
+| **patients** | Пациенты: ФИО, дата рождения |
+| **studies** | Исследования: ссылка на врача и пациента, дата, пути к снимкам, результаты |
+| **training_data** | Данные для обучения: координаты зон, вердикт врача |
+
+### Фрагмент модели Study:
+
+```python
+class Study(db.Model):
+    __tablename__ = 'studies'
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'), nullable=False)
+    study_date = db.Column(db.Date, nullable=False, default=datetime.utcnow)
+    original_image = db.Column(db.String(256), nullable=False)
+    result_image = db.Column(db.String(256), nullable=True)
+    findings = db.Column(db.Text, nullable=True)       
+    doctor_feedback = db.Column(db.Text, nullable=True)
+    feedback_given = db.Column(db.Boolean, default=False)

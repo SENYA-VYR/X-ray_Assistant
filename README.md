@@ -90,7 +90,7 @@
 │ └── feedback.html
 └── static/ ← CSS и загруженные снимки
 ├── style.css
-└── uploads/```
+└── uploads/```[7](https://markdown.land/markdown-code-block)
 
 ---
 

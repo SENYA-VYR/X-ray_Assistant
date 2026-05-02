@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Рентген-ассистент</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('dashboard') }}">Панель врача</a>
+        {% if current_user.is_authenticated %}
+            <span>{{ current_user.full_name }} ({{ current_user.institution }})</span>
+            <a href="{{ url_for('logout') }}">Выйти</a>
+        {% endif %}
+    </nav>
+    <div class="content">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for msg in messages %}<li>{{ msg }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

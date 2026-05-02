@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Результат анализа</h2>
+<p><b>Врач:</b> {{ study.doctor.full_name }}</p>
+<p><b>Учреждение:</b> {{ study.doctor.institution }}</p>
+<p><b>Пациент:</b> {{ study.patient.full_name }} ({{ study.patient.birth_date }})</p>
+<p><b>Дата исследования:</b> {{ study.study_date.strftime('%d.%m.%Y') }}</p>
+
+<h3>Исходный снимок</h3>
+<img src="{{ url_for('uploaded_file', filename=study.original_image) }}" style="max-width:400px;">
+
+<h3>Размеченный снимок</h3>
+<img src="{{ url_for('uploaded_file', filename=study.result_image) }}" style="max-width:400px;">
+
+<h3>Обнаруженные области</h3>
+{% if findings %}
+    {% set high_risk = findings|selectattr('mean_probability', 'ge', 0.65)|list %}
+    {% set medium_risk = findings|selectattr('mean_probability', 'ge', 0.35)|selectattr('mean_probability', 'lt', 0.65)|list %}
+    {% set low_risk = findings|selectattr('mean_probability', 'lt', 0.35)|list %}
+
+    <div style="margin-top: 20px;">
+        {% if high_risk|length > 0 %}
+        <div style="background: #ffe6e6; border-left: 5px solid #ff0000; padding: 15px; margin: 10px 0; border-radius: 5px;">
+            <h4 style="color: #cc0000; margin-top: 0;">Высокая вероятность трещины (≥65%)</h4>
+            <p style="font-size: 18px; font-weight: bold;">Обнаружено зон: {{ high_risk|length }}</p>
+            <p>Средняя вероятность: {{ "%.1f"|format(high_risk|sum(attribute='mean_probability') / high_risk|length * 100) }}%</p>
+            <ul>
+            {% for f in high_risk %}
+                <li>{{ f.crack_type }} — {{ "%.1f"|format(f.mean_probability*100) }}%</li>
+            {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if medium_risk|length > 0 %}
+        <div style="background: #fff3e6; border-left: 5px solid #ff8c00; padding: 15px; margin: 10px 0; border-radius: 5px;">
+            <h4 style="color: #cc6600; margin-top: 0;">Средняя вероятность трещины (35–64%)</h4>
+            <p style="font-size: 18px; font-weight: bold;">Обнаружено зон: {{ medium_risk|length }}</p>
+            <p>Средняя вероятность: {{ "%.1f"|format(medium_risk|sum(attribute='mean_probability') / medium_risk|length * 100) }}%</p>
+            <ul>
+            {% for f in medium_risk %}
+                <li>{{ f.crack_type }} — {{ "%.1f"|format(f.mean_probability*100) }}%</li>
+            {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if low_risk|length > 0 %}
+        <div style="background: #fffde6; border-left: 5px solid #ffcc00; padding: 15px; margin: 10px 0; border-radius: 5px;">
+            <h4 style="color: #996600; margin-top: 0;">Низкая вероятность трещины (<35%)</h4>
+            <p style="font-size: 18px; font-weight: bold;">Обнаружено зон: {{ low_risk|length }}</p>
+            <p>Средняя вероятность: {{ "%.1f"|format(low_risk|sum(attribute='mean_probability') / low_risk|length * 100) }}%</p>
+            <ul>
+            {% for f in low_risk %}
+                <li>{{ f.crack_type }} — {{ "%.1f"|format(f.mean_probability*100) }}%</li>
+            {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 5px;">
+        <p style="font-size: 16px; font-weight: bold; margin: 0;">
+            Всего обнаружено подозрительных зон: {{ findings|length }}
+            (высокая: {{ high_risk|length }}, средняя: {{ medium_risk|length }}, низкая: {{ low_risk|length }})
+        </p>
+    </div>
+
+{% else %}
+    <div style="background: #e8f5e9; border-left: 5px solid #4CAF50; padding: 20px; margin: 20px 0; border-radius: 5px;">
+        <h3 style="color: #2e7d32; margin-top: 0;">Подозрительные зоны не обнаружены</h3>
+        <p>Алгоритм не выявил областей, похожих на трещины или переломы кости.</p>
+    </div>
+{% endif %}
+
+{% if not study.feedback_given %}
+    <div style="margin-top: 30px; padding: 20px; background: #f0f8ff; border: 2px solid #4CAF50; border-radius: 10px;">
+        <h3 style="color: #2c3e50;">Обратная связь для обучения нейросети</h3>
+        <p>Пожалуйста, оцените качество анализа. Это поможет улучшить точность системы.</p>
+        <a href="{{ url_for('feedback', study_id=study.id) }}"
+           style="display: inline-block; padding: 12px 24px; background: #4CAF50; color: white;
+                  text-decoration: none; border-radius: 5px; font-size: 16px; margin-top: 10px;">
+            Дать обратную связь
+        </a>
+    </div>
+{% else %}
+    <div style="margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 5px;">
+        <p style="color: #2e7d32;">Обратная связь уже предоставлена. Спасибо!</p>
+    </div>
+{% endif %}
+
+<a href="{{ url_for('dashboard') }}" style="display: inline-block; margin-top: 20px;">Назад к списку</a>
+{% endblock %}

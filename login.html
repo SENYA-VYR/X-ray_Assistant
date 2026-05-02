@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .login-form {
+        max-width: 450px;
+        margin: 50px auto;
+        padding: 35px;
+        background: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    }
+
+    .login-form h2 {
+        margin-top: 0;
+        margin-bottom: 25px;
+        color: #2c3e50;
+        text-align: center;
+        font-size: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        font-size: 15px;
+        box-sizing: border-box;
+        transition: border-color 0.3s;
+    }
+
+    .form-group input:focus {
+        border-color: #4CAF50;
+        outline: none;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 14px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+        margin-top: 10px;
+    }
+
+    .submit-btn:hover {
+        background: #45a049;
+    }
+
+    .register-link {
+        text-align: center;
+        margin-top: 20px;
+        color: #666;
+    }
+
+    .register-link a {
+        color: #4CAF50;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .register-link a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="login-form">
+    <h2>Вход в систему</h2>
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="username">Логин:</label>
+            <input type="text" name="username" id="username"
+                   placeholder="Введите логин" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Пароль:</label>
+            <input type="password" name="password" id="password"
+                   placeholder="Введите пароль" required>
+        </div>
+
+        <button type="submit" class="submit-btn">Войти</button>
+    </form>
+
+    <p class="register-link">Нет аккаунта? <a href="{{ url_for('register') }}">Зарегистрироваться</a></p>
+</div>
+{% endblock %}

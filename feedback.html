@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Обратная связь по исследованию</h2>
+
+<div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+    <p><b>Пациент:</b> {{ study.patient.full_name }}</p>
+    <p><b>Дата:</b> {{ study.study_date.strftime('%d.%m.%Y') }}</p>
+    <p><b>Найдено зон:</b> {{ findings|length }}</p>
+</div>
+
+<h3>Размеченный снимок:</h3>
+<img src="{{ url_for('uploaded_file', filename=study.result_image) }}"
+     style="max-width: 100%; border: 2px solid #ddd; margin-bottom: 30px;">
+
+<form method="POST">
+    {% if findings %}
+        <h3>Оцените каждую обнаруженную зону:</h3>
+        <p style="color: #666;">Отметьте, действительно ли в выделенной области есть трещина или перелом.</p>
+
+        {% for f in findings %}
+        <div style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; background: #fafafa;">
+            <h4>Зона {{ loop.index }}: {{ f.crack_type }}</h4>
+            <p>
+                <b>Вероятность по оценке ИИ:</b> {{ "%.1f"|format(f.mean_probability*100) }}%<br>
+                <b>Координаты:</b> x:{{ f.bbox[0] }}, y:{{ f.bbox[1] }},
+                ширина:{{ f.bbox[2] }}, высота:{{ f.bbox[3] }}
+            </p>
+            <p><b>Есть ли трещина в этой области?</b></p>
+            <label style="margin-right: 30px;">
+                <input type="radio" name="zone_{{ loop.index0 }}" value="yes" required>
+                Да, есть трещина
+            </label>
+            <label>
+                <input type="radio" name="zone_{{ loop.index0 }}" value="no">
+                Нет, ложное срабатывание
+            </label>
+        </div>
+        {% endfor %}
+    {% else %}
+        <h3>Нейросеть не обнаружила подозрительных зон</h3>
+        <p style="color: #666;">Если на снимке есть трещины, которые нейросеть пропустила, отметьте это ниже:</p>
+
+        <div style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; background: #fafafa;">
+            <p><b>Есть ли на снимке трещины, которые не обнаружила система?</b></p>
+            <label style="margin-right: 30px;">
+                <input type="radio" name="missed_cracks" value="yes" required>
+                Да, система пропустила трещины
+            </label>
+            <label>
+                <input type="radio" name="missed_cracks" value="no">
+                Нет, снимок без трещин
+            </label>
+        </div>
+    {% endif %}
+
+    <div style="margin-top: 30px;">
+        <button type="submit" style="padding: 12px 30px; background: #4CAF50; color: white;
+                border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+            Отправить обратную связь
+        </button>
+        <a href="{{ url_for('result', study_id=study.id) }}" 
+           style="padding: 12px 30px; background: #999; color: white; 
+                  text-decoration: none; border-radius: 5px; margin-left: 10px;">
+            Отмена
+        </a>
+    </div>
+</form>
+{% endblock %}

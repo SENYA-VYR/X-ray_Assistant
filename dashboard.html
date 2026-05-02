@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Мои исследования</h2>
+<a href="{{ url_for('new_study') }}" class="btn">+ Новое исследование</a>
+<table>
+    <tr>
+        <th>Дата</th>
+        <th>Пациент</th>
+        <th>Снимок</th>
+        <th>Результат</th>
+        <th>Обратная связь</th>
+    </tr>
+    {% for s in studies %}
+    <tr>
+        <td>{{ s.study_date.strftime('%d.%m.%Y') }}</td>
+        <td>{{ s.patient.full_name }}</td>
+        <td><a href="{{ url_for('uploaded_file', filename=s.original_image) }}" target="_blank">открыть</a></td>
+        <td><a href="{{ url_for('result', study_id=s.id) }}">смотреть</a></td>
+        <td>
+            {% if s.feedback_given %}
+                <span style="color: green;">Дана</span>
+            {% else %}
+                <a href="{{ url_for('feedback', study_id=s.id) }}" style="color: #ff6600;">Оценить</a>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

@@ -76,21 +76,34 @@
 ## 🏗️ Архитектура проекта
 
 ### Структура файлов:
-```
+
 ── app.py ← логика
+
 ├── db.py ← модели базы данных
+
 ├── model.py ← нейросеть и анализ
+
 ├── templates/ ← HTML-страницы
+
 │ ├── base.html
+
 │ ├── login.html
+
 │ ├── register.html
+
 │ ├── dashboard.html
+
 │ ├── new_study.html
+
 │ ├── result.html
+
 │ └── feedback.html
+
 └── static/ ← CSS и загруженные снимки
+
 ├── style.css
-└── uploads/```[7](https://markdown.land/markdown-code-block)
+
+└── uploads/
 
 ---
 

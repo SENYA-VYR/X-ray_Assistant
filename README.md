@@ -98,35 +98,13 @@ crack_detector/
 
 ## 🔄 Схема информационных потоков
 
-РЕНТГЕНОЛОГ
-│
-├─ Авторизация/Регистрация ──→ Flask (сессия) ──→ SQLite (doctors)
-│
-├─ Новое исследование:
-│ ├─ Выбор пациента ──→ Flask ──→ SQLite (patients)
-│ └─ Загрузка снимка ──→ static/uploads/
-│
-├─ Анализ снимка:
-│ └─ Flask ──→ model.py ──→ OpenCV + Нейросеть
-│ │
-│ └─ Объединение результатов → снимок с рамками + JSON
-│ │
-│ └─ Flask ──→ result.html (визуализация)
-│
-├─ Обратная связь:
-│ └─ Врач оценивает каждую зону (да/нет)
-│ │
-│ ├─ Flask ──→ SQLite (training_data)
-│ └─ model.py → дообучение нейросети → crack_model.pth
-│
-└─ Просмотр истории:
-└─ Flask ──→ SQLite (studies) ──→ dashboard.html
+<img width="873" height="593" alt="схема инфопотока" src="https://github.com/user-attachments/assets/dea8d606-ce88-4642-872e-abc411b7c46d" />
 
 ---
 
 ## 🔗 Схема связи модулей
 
-
+<img width="1297" height="626" alt="схема связи модулей" src="https://github.com/user-attachments/assets/d69b4a2a-1963-4112-8959-a937124e5fcf" />
 
 ---
 
@@ -141,24 +119,9 @@ crack_detector/
 | **studies** | Исследования: ссылка на врача и пациента, дата, пути к снимкам, результаты |
 | **training_data** | Данные для обучения: координаты зон, вердикт врача |
 
-### Фрагмент модели Study:
-
-```python
-class Study(db.Model):
-    __tablename__ = 'studies'
-    id = db.Column(db.Integer, primary_key=True)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'), nullable=False)
-    study_date = db.Column(db.Date, nullable=False, default=datetime.utcnow)
-    original_image = db.Column(db.String(256), nullable=False)
-    result_image = db.Column(db.String(256), nullable=True)
-    findings = db.Column(db.Text, nullable=True)       
-    doctor_feedback = db.Column(db.Text, nullable=True)
-    feedback_given = db.Column(db.Boolean, default=False```
-
 ---
 
-### Фрагмент модели Study:
+### Реализовано:
 
 ✅ Веб-платформа с авторизацией и личным кабинетом врача
 
@@ -189,3 +152,17 @@ class Study(db.Model):
 ✅ Просмотр всех исследований в личном кабинете
 
 ✅ Компактный адаптивный интерфейс
+
+### Можно доработать:
+
+💡 Обучить нейросеть определять не просто «подозрительные зоны», а точные контуры трещин
+
+💡 Масштабировать платформу с личного кабинета врача до уровня отделения больницы
+
+💡 Реализовать ролевую модель (врач, администратор, главврач)
+
+💡 Добавить тепловую карту вероятностей поверх снимка
+
+💡 Реализовать экспорт результатов в PDF
+
+💡 Добавить сравнительный анализ снимков одного пациента в динамике
